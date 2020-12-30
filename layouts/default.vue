@@ -1,8 +1,18 @@
 <template>
   <div>
-    <Nuxt />
+    <Nuxt :class="{ 'lobbyActive' : lobbyStatus }"/>
   </div>
 </template>
+
+<script>
+export default {
+  computed: {
+    lobbyStatus() {
+      return this.$store.state.siteFunction.lobbyStatus
+    }
+  },
+}
+</script>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700&display=swap');
@@ -56,10 +66,56 @@ select:focus {outline: none;}
 
 }
 
+/* Page */
+.pageCon {
+  padding: 60px 60px 0 0;
+  transition: 0.2s;
+}
+.pageCon.lobbyActive {
+  padding: 60px 410px 0 0;
+}
+
 /* Global */
 .highlightTextP {color: var(--accent-1);}
-
+.padHori {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+.padVert {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
 .simplebar-scrollbar:before {
   background: #FFF;
+}
+
+/* Stylised Animated BTN */
+.btnStylised {
+  background-color: var(--accent-1);
+  border: none;
+  border-radius: 20px 2px 20px 2px;
+  padding: 10px 60px 12px;
+  color: #FFF;
+  cursor: pointer;
+  transition: 0.3s;
+  position: relative;
+  font-weight: bold;
+  transition-property: border-radius;
+}
+.btnStylised:hover {
+  border-radius: 2px 20px 2px 20px;
+}
+.underlineSpan {
+  position: absolute;
+  bottom: 6px;
+  left: 6px;
+  width: 20%;
+  height: 2px;
+  background-color: #FFF;
+  transition: 0.3s;
+}
+.btnStylised:hover .underlineSpan {
+  width: 80%;
+  left: 12px;
 }
 </style>

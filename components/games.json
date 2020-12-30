@@ -1,0 +1,38 @@
+[
+    {
+        "title": "Risk",
+        "slug": "risk",
+        "min_players": 4,
+        "max_players": 8,
+        "type": "multiplayer",
+        "tags": [
+            "multiplayer"
+        ],
+        "image": "https://steamcdn-a.akamaihd.net/steam/apps/1128810/capsule_616x353.jpg?t=1597988951",
+        "game_url": "https://risk.multiplayergames.com"
+    },
+    {
+        "title": "Among Us",
+        "slug": "among-us",
+        "min_players": 4,
+        "max_players": 8,
+        "type": "multiplayer",
+        "tags": [
+            "multiplayer"
+        ],
+        "image": "https://cnet3.cbsistatic.com/img/C_J1PUATAExNP3p1z2e0x083KEk=/0x154:1000x778/1200x675/2020/10/21/9f706d3a-dc30-4937-8195-47aa345288e5/promofinal.jpg",
+        "game_url": "https://amongus.multiplayergames.com"
+    },
+    {
+        "title": "Skribbl",
+        "slug": "skribbl",
+        "min_players": 4,
+        "max_players": 8,
+        "type": "multiplayer",
+        "tags": [
+            "multiplayer"
+        ],
+        "image": "https://skribbl.io/res/thumbnail.png",
+        "game_url": "https://skribbl.multiplayergames.com"
+    }
+]

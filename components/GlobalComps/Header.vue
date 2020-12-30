@@ -1,6 +1,6 @@
 <template>
     <header class="siteHeaderCon" :class="{ 'lobbyActive' : lobbyStatus }">
-        <img class="siteLogo" src="../assets/images/siteLogo.svg">
+        <img class="siteLogo" src="../../assets/images/siteLogo.svg">
         <div class="rightSide">
             <!-- Notifications -->
             <div class="notificationCon">
@@ -62,6 +62,7 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    z-index: 1000;
 }
 .siteHeaderCon.lobbyActive {
     right: 410px;

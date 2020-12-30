@@ -20,6 +20,7 @@ export default {
   // Plugins to run before rendering page (https://go.nuxtjs.dev/config-plugins)
   plugins: [
     { src: '~/plugins/vue-closable.js', ssr: false },
+    {src: '~/plugins/vue-particals.js', ssr: false}
   ],
 
   // Auto import components (https://go.nuxtjs.dev/config-components)
@@ -40,7 +41,7 @@ export default {
       imports: [
         {
           set: '@fortawesome/free-solid-svg-icons',
-          icons: ['faChevronRight', 'faChevronDown', 'faUsers', 'faPlus', 'faBell', 'faUser', 'faCog']
+          icons: ['faChevronRight', 'faChevronDown', 'faUsers', 'faPlus', 'faBell', 'faUser', 'faCog', 'faHome']
         }
       ]
     }],

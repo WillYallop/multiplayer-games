@@ -49,7 +49,7 @@
 <script>
 // Components
 import Simplebar from 'simplebar-vue'
-import Lobby from '@/components/Lobby'
+import Lobby from '@/components/GlobalComps/Lobby'
 
 export default {
     data() {
@@ -203,7 +203,7 @@ export default {
 </style>
 
 <style>
-.simplebar-content {
+.overflowCon .simplebar-content {
     height: 100%;
 }
 </style>
