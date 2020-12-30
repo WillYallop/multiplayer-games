@@ -10,7 +10,7 @@
             <div class="col1">
                 <!-- Particals -->
                 <client-only>
-                    <vue-particles class="particalBackground"
+                    <vue-particles class="particalBackground" v-if="showParticles"
                         color="#dedede"
                         :particleOpacity="0.7"
                         :particlesNumber="150"
@@ -35,12 +35,12 @@
                 </div>
                 <div class="col2ContentCon">
                     <h1>Sign In to Party Games</h1>
-                    <p class="subtitleP">Party games to play with friends and family!</p>
+                    <p class="subtitleP">Dont have an account? <nuxt-link to="/sign-up">Sign up here!</nuxt-link></p>
                     <div class="inputContainer">
                         <label for="emailIn">Email</label>
-                        <input type="text" id="emailIn" class="inputStyle" v-model="credentials.email">
+                        <input type="text" id="emailIn" class="inputStyle" autocomplete="email" v-model="credentials.email">
                         <label for="passwordIn">Password</label>
-                        <input type="password" id="passwordIn" class="inputStyle" v-model="credentials.password">
+                        <input type="password" id="passwordIn" autocomplete="current-password" class="inputStyle" v-model="credentials.password">
                         <p style="font-size: 14px; text-decoration: underline; cursor: pointer;">Forgot Password</p>
                     </div>
 
@@ -61,12 +61,16 @@
 export default {
     data() {
         return {
+            showParticles: false,
             credentials: {
                 email: '',
                 password: ''
             },
             errorMsg: false
         }
+    },
+    mounted() {
+        this.showParticles = true
     },
     components: {
 
@@ -182,7 +186,7 @@ export default {
 } 
 .subtitleP a {
     font-weight: bold;
-    color: #15AA4A;
+    color: var(--accent-1);
     text-decoration: none;
 }
 .inputContainer {
@@ -211,7 +215,7 @@ export default {
 }
 
 .footerP {
-    margin-top: 80px;
+    margin-top: 40px;
     color: var(--text-2);
     font-size: 14px;
 }

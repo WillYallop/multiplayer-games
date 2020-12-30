@@ -20,7 +20,7 @@ export default {
   // Plugins to run before rendering page (https://go.nuxtjs.dev/config-plugins)
   plugins: [
     { src: '~/plugins/vue-closable.js', ssr: false },
-    {src: '~/plugins/vue-particals.js', ssr: false}
+    { src: '~/plugins/vue-particals.js', ssr: false }
   ],
 
   // Auto import components (https://go.nuxtjs.dev/config-components)
@@ -32,25 +32,47 @@ export default {
 
   // Modules (https://go.nuxtjs.dev/config-modules)
   modules: [
-    // https://go.nuxtjs.dev/axios
+    '@nuxtjs/auth',
     '@nuxtjs/axios',
-    // https://go.nuxtjs.dev/pwa
     '@nuxtjs/pwa',
     ['nuxt-fontawesome', {
       component: 'fa',
       imports: [
         {
           set: '@fortawesome/free-solid-svg-icons',
-          icons: ['faChevronRight', 'faChevronDown', 'faUsers', 'faPlus', 'faBell', 'faUser', 'faCog', 'faHome']
+          icons: ['faChevronRight', 'faChevronDown', 'faUsers', 'faPlus', 'faBell', 'faUser', 'faCog', 'faHome', 'faUnlockAlt', 'faEye', 'faSignOutAlt']
         }
       ]
     }],
   ],
-
+  // User Auth
+  auth: {
+    strategies: {
+      local: {
+        endpoints: {
+          login: { url: '/user/signin', method: 'post', propertyName: 'token' },
+          user: { url: '/user', method: 'get', propertyName: 'data' },
+          logout: false
+        },
+        autoFetchUser: true
+      }
+    },
+    redirect: false,
+    resetOnError: true,
+  },
   // Axios module configuration (https://go.nuxtjs.dev/config-axios)
-  axios: {},
-
+  axios: {
+    baseURL: 'https://multiplayer-game-api.herokuapp.com/v1'
+  },
   // Build Configuration (https://go.nuxtjs.dev/config-build)
   build: {
-  }
+  },
+  env: {
+    API_URL: 'https://multiplayer-game-api.herokuapp.com/v1'
+
+  },
+  server: {     
+    port: process.env.PORT || 8000,
+    host: '0.0.0.0',  
+  },
 }

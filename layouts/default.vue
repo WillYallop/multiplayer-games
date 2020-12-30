@@ -100,6 +100,7 @@ select:focus {outline: none;}
   transition: 0.3s;
   position: relative;
   font-weight: bold;
+  font-size: 16px;
   transition-property: border-radius;
 }
 .btnStylised:hover {

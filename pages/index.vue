@@ -33,6 +33,7 @@ import Sidebar from '@/components/GlobalComps/Sidebar'
 import games from '@/components/games.json'
 
 export default {
+  middleware: 'auth-logged-in',
   data() {
     return {
       gamesData: games

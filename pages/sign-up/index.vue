@@ -10,7 +10,7 @@
             <div class="col1">
                 <!-- Particals -->
                 <client-only>
-                    <vue-particles class="particalBackground"
+                    <vue-particles class="particalBackground" v-if="showParticles"
                         color="#dedede"
                         :particleOpacity="0.7"
                         :particlesNumber="150"
@@ -35,30 +35,43 @@
                 </div>
                 <div class="col2ContentCon">
                     <h1>Sign Up to Party Games</h1>
-                    <p class="subtitleP">Party games to play with friends and family!</p>
+                    <p class="subtitleP">Have an account already? <nuxt-link to="/sign-in">Sign in here!</nuxt-link></p>
                     <div class="inputContainer">
                         <div class="inputCol">
                             <label for="fNamnIn">First Name</label>
-                            <input type="text" id="fNamnIn" class="inputStyle" v-model="credentials.first_name">
-                        </div>
+                            <input type="text" id="fNamnIn" class="inputStyle" v-model="credentials.first_name" :class="{ 'inputNoData' : verifyFirstName === false }">
+                        </div> 
                         <div class="inputCol">
                             <label for="lNameIn">Last Name</label>
-                            <input type="text" id="lNameIn" class="inputStyle" v-model="credentials.last_name">
+                            <input type="text" id="lNameIn" class="inputStyle" v-model="credentials.last_name" :class="{ 'inputNoData' : verifyLastName === false }">
                         </div>
                         <label for="usernameIn">Username</label>
-                        <input type="text" id="usernameIn" class="inputStyle" v-model="credentials.username">
+                        <input type="text" id="usernameIn" class="inputStyle" v-model="credentials.username" :class="{ 'inputNoData' : verifyUsername === false }">
                         <label for="emailIn">Email</label>
-                        <input type="text" id="emailIn" class="inputStyle" v-model="credentials.email">
+                        <input type="text" id="emailIn" class="inputStyle" v-model="credentials.email" :class="{ 'inputNoData' : verifyEmail === false }">
+
                         <label for="passwordIn">Password</label>
-                        <input type="password" id="passwordIn" class="inputStyle" v-model="credentials.password">
+                        <div class="inputWrapper">
+                            <input :type="passwordType" id="passwordIn" class="inputStyle" v-model="credentials.password" :class="{ 'inputNoData' : verifyPassword === false }">
+                            <div class="passInputIconCon" style="cursor: pointer;" v-on:click="showPassword">
+                                <fa class="fas" :icon="['fas', 'eye']"/>
+                            </div>
+                            <div class="passInputIconCon">
+                                <fa class="fas" :icon="['fas', 'unlock-alt']" :class="{ 'strongPas' : passwordStrength === 'strong', 'mediumPas' : passwordStrength === 'medium', 'weakPas' : passwordStrength === 'weak', 'noPas' : passwordStrength === false }"/>
+                            </div>
+                        </div>  
+                        
                         <label for="passwordRepeatIn">Password Repeat</label>
-                        <input type="password" id="passwordRepeatIn" class="inputStyle" v-model="credentials.password_repeat">
+                        <input :type="passwordType" id="passwordRepeatIn" class="inputStyle" v-model="credentials.password_repeat" :class="{ 'inputNoData' : verifyPassword === false }">
+                    </div>  
+                    
+                    <div class="errorMsgContainer" v-if="emptyFields.length > 0">
+                        <ul class="errorMsgUl">
+                            <li :key="field" v-for="field in emptyFields">{{field}}</li>
+                        </ul>
                     </div>
 
-                    <button class="btnStylised" v-on:click="signUp" aria-label="Sign In"><span class="underlineSpan"></span>Sign Up</button>
-                    <div class="errorMsgCon" v-if="errorMsg">
-                        <p>{{errorMsg}}</p>
-                    </div>
+                    <button :disabled="loadingSpinner" class="btnStylised" v-on:click="signUp" aria-label="Sign In"><span class="underlineSpan"></span><span v-if="loadingSpinner">Creating Account <img src="../../assets/images/loadingIndicator.gif" class="loadingImg"></span><span v-else>Sign Up</span></button>
 
                     <p class="footerP"><nuxt-link to="/privacy-policy">Privacy Policy</nuxt-link> and <nuxt-link to="/terms-conditions">Terms & Conditions</nuxt-link> apply</p>
                 </div>
@@ -69,22 +82,209 @@
 </template>
 
 <script>
+// Libs
+import axios from 'axios'
+
 export default {
     data() {
         return {
+            loadingSpinner: false,
+            showParticles: false,
             credentials: {
-                email: '',
-                password: ''
+                first_name: '', 
+                last_name: '', 
+                username: '',
+                email: '', 
+                password: '', 
+                password_repeat: '',
+                userCountry: '',
+                userIp: '',
+                userCity: ''
             },
-            errorMsg: false
+            fieldsVerified: [false, false, false, false, false],
+            // 
+            passwordType: 'password',
+            emptyFields: []
         }
+    },
+    mounted() {
+        this.showParticles = true
+        axios.get('https://ipinfo.io?token=b0132d6894662b')
+        .then((response) => { 
+            this.credentials.userIp = response.data.ip
+            this.credentials.userCountry = response.data.country
+            this.credentials.userCity = response.data.city
+        })
+        .catch((err) => {
+            console.log(err)
+        })
     },
     components: {
 
     },
+    computed: {
+        // Verify
+        verifyFirstName() {
+            if(this.credentials.first_name.length > 0) {
+                var regex = /^[a-zA-Z]+(?:-[a-zA-Z]+)*$/
+                if(regex.test(this.credentials.first_name)) {
+                    this.fieldsVerified[0] = true
+                    return true
+                } else {
+                    this.fieldsVerified[0] = false
+                    return false
+                }
+            } else {
+                this.fieldsVerified[0] = false
+                return false
+            }
+        },
+        verifyLastName() {
+            if(this.credentials.last_name.length > 0) {
+                var regex = /^[a-zA-Z]+(?:-[a-zA-Z]+)*$/
+                if(regex.test(this.credentials.last_name)) {
+                    this.fieldsVerified[1] = true
+                    return true
+                } else {
+                    this.fieldsVerified[1] = false
+                    return false
+                }
+            } else {
+                this.fieldsVerified[1] = false
+                return false
+            }
+        },
+        verifyUsername() {
+            if(this.credentials.username.length > 1 && this.credentials.username.length < 16) {
+                var regex = /^[a-zA-Z0-9 ?!$-_]+(?:-[a-zA-Z0-9 ?!$-_]+)*$/
+                if(regex.test(this.credentials.username)) {
+                    this.fieldsVerified[2] = true
+                    return true
+                } else {
+                    this.fieldsVerified[2] = false
+                    return false
+                }
+            } else {
+                this.fieldsVerified[2] = false
+                return false
+            }
+        },
+        verifyEmail() {
+            if(this.credentials.email.length > 0) {
+                var regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
+                if(regex.test(this.credentials.email)) {
+                    this.fieldsVerified[3] = true
+                    return true
+                } else {
+                    this.fieldsVerified[3] = false
+                    return false
+                }
+            } else {
+                this.fieldsVerified[3] = false
+                return false
+            }
+        },
+        verifyPassword() {
+            var strongRegex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})");
+            var mediumRegex = new RegExp("^(((?=.*[a-z])(?=.*[A-Z]))|((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9])))(?=.{8,})");
+            if(this.credentials.password === this.credentials.password_repeat) {
+                if(this.credentials.password.length >= 4) {
+                    if(strongRegex.test(this.credentials.password)) {
+                        this.fieldsVerified[4] = true
+                        return 'strong'
+                    } else if (mediumRegex.test(this.credentials.password)) {
+                        this.fieldsVerified[4] = true
+                        return 'medium'
+                    } else {
+                        this.fieldsVerified[4] = false
+                        return 'weak'
+                    }
+                } else {
+                    this.fieldsVerified[4] = false
+                    return false
+                }
+            } else {
+                this.fieldsVerified[4] = false
+                return false
+            }
+        },
+        passwordStrength() {
+            var strongRegex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})");
+            var mediumRegex = new RegExp("^(((?=.*[a-z])(?=.*[A-Z]))|((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9])))(?=.{8,})");
+            if(this.credentials.password.length >= 4) {
+                if(strongRegex.test(this.credentials.password)) {
+                    return 'strong'
+                } else if (mediumRegex.test(this.credentials.password)) {
+                    return 'medium'
+                } else {
+                    return 'weak'
+                }
+            } else {
+                return false
+            }
+        },
+    },
     methods: {
+        verifyDataHandler() {
+            let checker = arr => arr.every(Boolean);
+            if(checker(this.fieldsVerified)) {
+                return true
+            } else {
+                return false
+            }  
+        },
         signUp() {
-
+            this.loadingSpinner = true
+            this.emptyFields = []
+            if(this.verifyDataHandler()) {
+                // Sign up
+                axios.post(process.env.API_URL + '/user/signup', this.credentials)
+                .then((res) => {
+                    //Sign In
+                    this.$auth.loginWith('local', { 
+                        data: this.credentials
+                    })
+                    .then(() => {
+                        this.$router.push('/')
+                    })
+                })
+                .catch((err) => {
+                    this.loadingSpinner = false
+                    if(err) {
+                        if(err.response.status === 409) {
+                            this.emptyFields.push('A user with that email already exists')
+                        }
+                        if(err.response.status === 500) {
+                            this.emptyFields.push('There was an unknown error creating your account')
+                        }
+                    }
+                })
+            } else {
+                this.loadingSpinner = false
+                if(!this.fieldsVerified[0]) {
+                    this.emptyFields.push('Add a valid first name')
+                }
+                if(!this.fieldsVerified[1]) {
+                    this.emptyFields.push('Add a valid last name')
+                }
+                if(!this.fieldsVerified[2]) {
+                    this.emptyFields.push('Add a valid username')
+                }
+                if(!this.fieldsVerified[3]) {
+                    this.emptyFields.push('Add a valid email')
+                }
+                if(!this.fieldsVerified[4]) {
+                    this.emptyFields.push('Add valid password')
+                }
+            }
+        },
+        //Password
+        showPassword() {
+            if(this.passwordType === 'text') {
+                this.passwordType = 'password'
+            } else if(this.passwordType === 'password') {
+                this.passwordType = 'text'
+            }
         },
     }
 }
@@ -173,7 +373,7 @@ export default {
 } 
 .subtitleP a {
     font-weight: bold;
-    color: #15AA4A;
+    color: var(--accent-1);
     text-decoration: none;
 }
 .inputContainer {
@@ -193,7 +393,7 @@ export default {
 .inputStyle {
     width: 100%;
     background-color: #FAFAFA;
-    border: none;
+    border: 2px solid #FAFAFA;
     border-radius: 5px;
     margin-top: 5px;
     margin-bottom: 10px;
@@ -202,13 +402,72 @@ export default {
     font-size: 16px;
     -webkit-appearance: none;
 }   
+.inputNoData:focus {
+    border: 2px solid var(--accent-1);
+}
 .btnStylised {
     margin-top: 20px;
     width: 100%;
 }
+.loadingImg {
+    height: 25px;
+    width: 25px;
+    margin-left: 10px;
+}
+
+/* Error */
+.errorMsgContainer {
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: var(--background-2);
+}
+.errorMsgUl {
+    margin: 0;
+    padding-left: 20px;
+    color: #FFF;
+}
+.errorMsgUl li {
+    font-size: 14px;
+}
+
+/* input overlay */
+.inputWrapper {
+    width: 100%;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+}
+.inputWrapper .inputStyle {
+    width: calc(100% - 90px);
+}
+.passInputIconCon {
+    margin-top: 5px;
+    height: 40px;
+    width: 40px;
+    margin-left: 10px;
+    background-color: #F2F2F2;
+    border: 1px solid #DCDCDC;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.passInputIconCon .fas {
+    font-size: 14px;
+    color: #0c0909;
+}
+.passInputIconCon p {
+    font-size: 12px;
+}
+.strongPas {color: #06D67B !important;} 
+.mediumPas {color: #FD9D53 !important;} 
+.weakPas {color: #FF2273 !important;} 
+.noPas {color: #FF2273 !important;} 
+
 
 .footerP {
-    margin-top: 80px;
+    margin-top: 40px;
     color: var(--text-2);
     font-size: 14px;
 }

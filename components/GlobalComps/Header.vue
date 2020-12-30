@@ -10,15 +10,16 @@
             <div class="userBtnContainer">
                 <div class="userDropwdownBtn">  
                     <div class="buttonSection" v-on:click="userDropdown = !userDropdown" :class="{ 'dropdownActive' : userDropdown }" ref="closeDropBtn">
-                        <div class="profileDetailsCon">
+                        <div class="profileDetailsCon" v-if="this.$store.state.auth.loggedIn">
                             <img src="https://avatarfiles.alphacoders.com/865/86518.png" class="userProfilePic">
-                            <p>FILS_W1LL</p>
+                            <p>{{$auth.user.username}}</p>
                         </div>
                         <fa class="fas toggleDropdownBtn" :icon="['fa', 'chevron-down']"/>
                     </div>
                     <div class="dropdownSection" v-if="userDropdown" v-closable="{exclude: ['closeDropBtn'], handler: 'closeUserDropdown'}">
                         <nuxt-link class="dropdownLink" to="/user">Profile <fa class="fas" :icon="['fa', 'user']"/></nuxt-link>
                         <nuxt-link class="dropdownLink" to="/settings">Settings <fa class="fas" :icon="['fa', 'cog']"/></nuxt-link>
+                        <p class="dropdownLink" v-on:click="signOut()">Sign Out <fa class="fas" :icon="['fa', 'sign-out-alt']"/></p>
                     </div>
                 </div>
             </div>
@@ -44,6 +45,12 @@ export default {
     methods: {
         closeUserDropdown() {
             this.userDropdown = !this.userDropdown
+        },
+        signOut() {
+            this.$auth.logout()
+            .then(() => {
+                this.$router.go()
+            })
         }
     }
 }
@@ -169,6 +176,7 @@ export default {
     justify-content: space-between;
     background-color: var(--accent-1);
     transition: 0.2s;
+    cursor: pointer;
 }
 .dropdownLink:last-child {
     border-bottom: none;
