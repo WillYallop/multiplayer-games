@@ -38,9 +38,9 @@
                     <p class="subtitleP">Dont have an account? <nuxt-link to="/sign-up">Sign up here!</nuxt-link></p>
                     <div class="inputContainer">
                         <label for="emailIn">Email</label>
-                        <input type="text" id="emailIn" class="inputStyle" autocomplete="email" v-model="credentials.email">
+                        <input type="text" id="emailIn"  v-on:keyup.enter="signIn" class="inputStyle" autocomplete="email" v-model="credentials.email">
                         <label for="passwordIn">Password</label>
-                        <input type="password" id="passwordIn" autocomplete="current-password" class="inputStyle" v-model="credentials.password">
+                        <input type="password" id="passwordIn" v-on:keyup.enter="signIn" autocomplete="current-password" class="inputStyle" v-model="credentials.password">
                         <p style="font-size: 14px; text-decoration: underline; cursor: pointer;">Forgot Password</p>
                     </div>
 
@@ -198,16 +198,7 @@ export default {
     color: var(--text-2);
 }
 .inputStyle {
-    width: 100%;
-    background-color: #FAFAFA;
-    border: none;
-    border-radius: 5px;
     margin-top: 5px;
-    margin-bottom: 10px;
-    padding: 0 10px;
-    height: 40px;
-    font-size: 16px;
-    -webkit-appearance: none;
 }   
 .btnStylised {
     margin-top: 20px;

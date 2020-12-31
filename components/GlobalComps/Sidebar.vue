@@ -20,7 +20,7 @@
             <Simplebar class="overflowCon" data-simplebar-auto-hide="true">
                 <!-- Add User Btn -->
                 <div class="addUserBtnCon">
-                    <button class="addUserBtn"><fa class="fas" :icon="['fa', 'plus']"/></button>
+                    <button class="addUserBtn" v-on:click="$store.commit('setModalComponent', 'FriendActions')"><fa class="fas" :icon="['fa', 'plus']"/></button>
                 </div>
                 <div class="userListIconCon">
                     <div class="userCon">

@@ -391,17 +391,8 @@ export default {
     width: calc(50% - 10px);
 }
 .inputStyle {
-    width: 100%;
-    background-color: #FAFAFA;
-    border: 2px solid #FAFAFA;
-    border-radius: 5px;
     margin-top: 5px;
-    margin-bottom: 10px;
-    padding: 0 10px;
-    height: 40px;
-    font-size: 16px;
-    -webkit-appearance: none;
-}   
+}    
 .inputNoData:focus {
     border: 2px solid var(--accent-1);
 }
@@ -410,8 +401,8 @@ export default {
     width: 100%;
 }
 .loadingImg {
-    height: 25px;
-    width: 25px;
+    height: 16px;
+    width: 16px;
     margin-left: 10px;
 }
 

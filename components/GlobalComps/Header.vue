@@ -11,7 +11,7 @@
                 <div class="userDropwdownBtn">  
                     <div class="buttonSection" v-on:click="userDropdown = !userDropdown" :class="{ 'dropdownActive' : userDropdown }" ref="closeDropBtn">
                         <div class="profileDetailsCon" v-if="this.$store.state.auth.loggedIn">
-                            <img src="https://avatarfiles.alphacoders.com/865/86518.png" class="userProfilePic">
+                            <img src="https://avatarfiles.alphacoders.com/865/86518.png" class="userProfilePic" :style="{ 'border' : `2px solid ${$auth.user.accentColor}` }">
                             <p>{{$auth.user.username}}</p>
                         </div>
                         <fa class="fas toggleDropdownBtn" :icon="['fa', 'chevron-down']"/>

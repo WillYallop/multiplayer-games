@@ -21,6 +21,9 @@
       </div>
 
     </div>
+
+    <SiteModal/>
+
   </div>
 </template>
 
@@ -28,6 +31,7 @@
 // Componenets
 import SiteHeader from '@/components/GlobalComps/Header'
 import Sidebar from '@/components/GlobalComps/Sidebar'
+import SiteModal from '@/components/GlobalComps/SiteModal'
 
 // Data
 import games from '@/components/games.json'
@@ -42,7 +46,8 @@ export default {
   },
   components: {
     SiteHeader,
-    Sidebar
+    Sidebar,
+    SiteModal
   },
   methods: {
 

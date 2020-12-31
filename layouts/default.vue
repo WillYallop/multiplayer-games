@@ -60,6 +60,7 @@ select:focus {outline: none;}
   --accent-1: #FF4654;
   --accent-1-hover: #E93C49;
   --accent-2: #1CD15C;
+  --accent-2-hover: #19B550;
 
   --text-1: #FFF;
   --text-2: #C9D1D9;
@@ -119,4 +120,17 @@ select:focus {outline: none;}
   width: 80%;
   left: 12px;
 }
+
+/* INput Styling */
+.inputStyle {
+  width: 100%;
+  background-color: #FAFAFA;
+  border: 2px solid #FAFAFA;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  padding: 0 8px;
+  height: 40px;
+  font-size: 16px;
+  -webkit-appearance: none;
+}    
 </style>
