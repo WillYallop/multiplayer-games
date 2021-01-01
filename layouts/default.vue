@@ -6,11 +6,23 @@
 
 <script>
 export default {
+  data() {
+    return {
+
+    }
+  },
+  mounted() {
+        
+  },
   computed: {
     lobbyStatus() {
       return this.$store.state.siteFunction.lobbyStatus
-    }
+    },
+    
   },
+  methods: {
+
+  }
 }
 </script>
 

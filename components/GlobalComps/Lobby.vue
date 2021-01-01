@@ -2,7 +2,7 @@
     <div class="lobbyWrapper">
 
         <div class="lobbyHeaderCon">
-            <p class="lobbyHeaderP"><fa class="fas" :icon="['fa', 'users']"/> Lobby <span class="highlightTextP">1/8</span></p>
+            <p class="lobbyHeaderP"><fa class="fas" :icon="['fa', 'users']"/> Lobby <span class="highlightTextP">0/8</span></p>
         </div>
      
         <Simplebar class="lobbyBody" data-simplebar-auto-hide="true">

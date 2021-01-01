@@ -11,8 +11,11 @@
                 <div class="userDropwdownBtn">  
                     <div class="buttonSection" v-on:click="userDropdown = !userDropdown" :class="{ 'dropdownActive' : userDropdown }" ref="closeDropBtn">
                         <div class="profileDetailsCon" v-if="this.$store.state.auth.loggedIn">
-                            <img src="https://avatarfiles.alphacoders.com/865/86518.png" class="userProfilePic" :style="{ 'border' : `2px solid ${$auth.user.accentColor}` }">
-                            <p>{{$auth.user.username}}</p>
+                            <img :src="$auth.user.profileImage" class="userProfilePic" :style="{ 'border' : `2px solid ${$auth.user.accentColor}`, 'background-color' : $auth.user.accentColor }">
+                            <div class="textarea">
+                                <p>{{$auth.user.username}}</p>
+                                <p class="gamerTagP">Tag: {{$auth.user.gamerTag}}</p>
+                            </div>
                         </div>
                         <fa class="fas toggleDropdownBtn" :icon="['fa', 'chevron-down']"/>
                     </div>
@@ -132,14 +135,21 @@ export default {
 .profileDetailsCon {
     display: flex;
     align-items: center;
+
+}
+.textarea {
+    max-width: 110px;
+    padding-left: 5px;
+}
+.textarea p {
+    color: var(--text-2);
+    font-size: 14px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
-.profileDetailsCon p {
-    color: var(--text-2);
-    font-size: 14px;
-    padding-left: 5px;
+.gamerTagP {
+    font-size: 12px !important;
 }
 .userProfilePic {
     height: 30px;

@@ -4,10 +4,12 @@ const state = () => ({
         status: false,
         component: ''
     }
+    
 
 })
   
 const mutations = {
+    // Lobby 
     toggleLobby(state) {
         state.lobbyStatus = !state.lobbyStatus;
     },
@@ -19,6 +21,7 @@ const mutations = {
         state.modalInfo.status = true
         state.modalInfo.component = comp
     }
+
 
 }
 

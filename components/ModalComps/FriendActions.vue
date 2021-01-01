@@ -15,7 +15,7 @@
             <p class="errorP" v-if="searchUserError">{{searchUserError}}</p>
             <Simplebar class="actionConBody" data-simplebar-auto-hide="true" >
                 <div class="userResults" :key="user._id" v-for="user in searchUserResults">
-                    <img :src="user.profileImage" class="userProfilePic" :style="{ 'border' : `2px solid ${user.accentColor}` }">
+                    <img :src="user.profileImage" class="userProfilePic" :style="{ 'border' : `2px solid ${user.accentColor}`, 'background-color' : user.accentColor }">
                     <div class="userTextarea">
                         <p class="usernameP">{{user.username}} <span>({{user.gamerTag}})</span></p>
                         <p class="experienceP">{{user.experience}}</p>
@@ -30,7 +30,7 @@
             <button class="refreshFriendRequestsBtn" v-on:click="findRequests">Refresh</button>
             <Simplebar class="actionConBody" data-simplebar-auto-hide="true">
                 <div class="userResults" :key="user._id" v-for="user in friendRequestsResults">
-                    <img :src="user.usersProfileImage" class="userProfilePic" :style="{ 'border' : `2px solid ${user.usersAccentColor}` }">
+                    <img :src="user.usersProfileImage" class="userProfilePic" :style="{ 'border' : `2px solid ${user.usersAccentColor}`, 'background-color' : user.accentColor }">
                     <div class="userTextarea">
                         <p class="usernameP">{{user.usersUsername}} <span>({{user.usersGamerTag}})</span></p>
                         <p class="experienceP">{{user.usersExperience}}</p>
@@ -101,6 +101,8 @@ export default {
                 .then((res) => {
                     let requestIndex = this.friendRequestsResults.findIndex(x => x._id === requestId)
                     this.friendRequestsResults.splice(requestIndex, 1)
+
+                    this.$store.dispatch('loadFriendListData')
                 })
                 .catch((err) => {
                     console.log(err)
@@ -113,6 +115,8 @@ export default {
                 .then((res) => {
                     let requestIndex = this.friendRequestsResults.findIndex(x => x._id === requestId)
                     this.friendRequestsResults.splice(requestIndex, 1)
+
+                    this.$store.dispatch('loadFriendListData')
                 })
                 .catch((err) => {
                     console.log(err)

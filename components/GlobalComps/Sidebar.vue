@@ -12,7 +12,7 @@
                 <button v-else class="toggleLobbyBtn" v-on:click="$store.commit('toggleLobby')">
                     <fa class="fas" :icon="['fa', 'users']"/> 
                     <div class="lobbyCountCon">
-                        <p class="highlightTextP">1/8</p>
+                        <p class="highlightTextP">0/8</p>
                     </div>
                 </button>
             </div>
@@ -23,22 +23,10 @@
                     <button class="addUserBtn" v-on:click="$store.commit('setModalComponent', 'FriendActions')"><fa class="fas" :icon="['fa', 'plus']"/></button>
                 </div>
                 <div class="userListIconCon">
-                    <div class="userCon">
-
-                        <div class="userStatusCon online"></div>
+                    <div class="userCon" :key="friend._id" v-for="friend in friendsList" :style="{ 'background-image' : `url(${friend.profileImage})`, 'border' : `3px solid ${friend.accentColor}`, 'background-color' : friend.accentColor }" v-on:click="$router.push('/user/'+friend._id)">
+                        <div class="userStatusCon" :class="{ 'online' : friend.status === 'online' }"></div>
                     </div>
-                    <div class="userCon">
-                        
-                        <div class="userStatusCon idle"></div>
-                    </div>
-                    <div class="userCon">
-                        
-                        <div class="userStatusCon idle"></div>
-                    </div>
-                    <div class="userCon">
-                        
-                        <div class="userStatusCon offline"></div>
-                    </div>
+                    <button v-on:click="send">g</button>
                 </div>
             </Simplebar>
 
@@ -47,6 +35,9 @@
 </template>
 
 <script>
+// Libs
+import io from 'socket.io-client'
+
 // Components
 import Simplebar from 'simplebar-vue'
 import Lobby from '@/components/GlobalComps/Lobby'
@@ -54,7 +45,7 @@ import Lobby from '@/components/GlobalComps/Lobby'
 export default {
     data() {
         return {
-
+  
         }
     },
     components: {
@@ -62,13 +53,28 @@ export default {
         Lobby,
 
     },
+    mounted() {
+        this.$store.dispatch('loadFriendListData')
+
+        // handle the event sent with socket.send()
+        this.$socketTest.on('friendRequest', data => {
+            console.log(data);
+        });
+
+    },
     computed: {
         lobbyStatus() {
             return this.$store.state.siteFunction.lobbyStatus
-        }
+        },
+        friendsList() {
+            return this.$store.state.friends.friendsList
+        },
     },
     methods: {
-
+        send() {
+            // or with emit() and custom event names
+            this.$socketTest.emit('friendRequest', 'Hello there!');
+        },
     }
 }
 </script>
@@ -167,17 +173,20 @@ export default {
     background-color: #194F6B;
     margin: 0 0 5px;
     position: relative;
+    background-size: cover;
+    background-position: center;
+    cursor: pointer;
 }
 .userCon:last-child {
     margin-bottom: 0;
 }
-
 .userStatusCon {
     position: absolute;
-    bottom: 2px;
-    right: 2px;
+    bottom: 0px;
+    right: 0px;
     width: 10px;
     height: 10px;
+    border: 1px solid black;
     border-radius: 50%;
 }
 .online {background-color: var(--accent-2);} 
