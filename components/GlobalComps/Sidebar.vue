@@ -17,18 +17,23 @@
                 </button>
             </div>
             <!-- Simplebar -->
-            <Simplebar class="overflowCon" data-simplebar-auto-hide="true">
+            <div class="overflowCon" data-simplebar-auto-hide="true">
                 <!-- Add User Btn -->
                 <div class="addUserBtnCon">
-                    <button class="addUserBtn" v-on:click="$store.commit('setModalComponent', 'FriendActions')"><fa class="fas" :icon="['fa', 'plus']"/></button>
+                    <button class="addUserBtn" v-on:click="$store.commit('setModalComponent', 'FriendActions')"><fa class="fas" :icon="['fa', 'plus']"/><div class="friendRequestTotal" v-if="friendRequestTotal > 0"><p>{{friendRequestTotal}}</p></div></button>
                 </div>
-                <div class="userListIconCon">
-                    <div class="userCon" :key="friend._id" v-for="friend in friendsList" :style="{ 'background-image' : `url(${friend.profileImage})`, 'border' : `3px solid ${friend.accentColor}`, 'background-color' : friend.accentColor }" v-on:click="$router.push('/user/'+friend._id)">
+                <div class="userListIconCon" ref="userListIconCon">
+                    <div class="userCon" @contextmenu="handler($event, friend)" v-on:click="handler($event, friend)" :key="friend._id" v-for="friend in friendsList" :style="{ 'background-image' : `url(${friend.profileImage})`, 'border' : `3px solid ${friend.accentColor}`, 'background-color' : friend.accentColor }">
                         <div class="userStatusCon" :class="{ 'online' : friend.status === 'online' }"></div>
                     </div>
-                    <button v-on:click="send">g</button>
                 </div>
-            </Simplebar>
+            </div>
+
+            <!-- User action box -->
+            <div class="userActionBoxCon" :style="actionMenuPos" v-if="showUserActionBox" v-closable="{exclude: ['userListIconCon'], handler: 'closeUserActionBox'}">
+                <nuxt-link class="userActionBoxLink" @click.native="showUserActionBox = false" :to="'/user/'+selectedFriendId">View Profile <fa class="fas" :icon="['fa', 'user']"/></nuxt-link>
+                <p class="userActionBoxLink" v-on:click="addToLobby(selectedFriendId); showUserActionBox = false">Add To Lobby <fa class="fas" :icon="['fa', 'plus']"/></p>
+            </div>
 
         </div>
     </div>
@@ -45,7 +50,9 @@ import Lobby from '@/components/GlobalComps/Lobby'
 export default {
     data() {
         return {
-  
+            showUserActionBox: false,
+            actionMenuPos: '',
+            selectedFriendId: ''
         }
     },
     components: {
@@ -55,12 +62,17 @@ export default {
     },
     mounted() {
         this.$store.dispatch('loadFriendListData')
+        this.$store.dispatch('loadFriendRequestData')
 
-        // handle the event sent with socket.send()
-        this.$socketTest.on('friendRequest', data => {
-            console.log(data);
+        // Handle friend request ping
+        this.$socketTest.on('friendRequestPing', data => {
+            this.$store.commit('incrementFriendRequestTotal')
         });
-
+        // Handle new friend added
+        this.$socketTest.on('newFriend', data => {
+            console.log(data)
+            this.$store.commit('addNewFriend', data)
+        });
     },
     computed: {
         lobbyStatus() {
@@ -69,12 +81,23 @@ export default {
         friendsList() {
             return this.$store.state.friends.friendsList
         },
+        friendRequestTotal() {
+            return this.$store.state.friends.friendRequestTotal
+        }
     },
     methods: {
-        send() {
-            // or with emit() and custom event names
-            this.$socketTest.emit('friendRequest', 'Hello there!');
+        handler(e, friend) {
+            this.showUserActionBox = !this.showUserActionBox
+            this.actionMenuPos = `top: ${e.clientY}px; left: ${e.clientX - 200}px;`
+            this.selectedFriendId = friend._id
+            e.preventDefault();
         },
+        closeUserActionBox() {
+            this.showUserActionBox = false
+        },
+        addToLobby(userId) {
+            console.log(userId)
+        }
     }
 }
 </script>
@@ -131,6 +154,17 @@ export default {
 /* Overflow */
 .overflowCon {
     height: calc(100% - 60px);
+    overflow-x: visible !important;
+    overflow-y: scroll;
+    
+    position: relative;
+}
+.overflowCon::-webkit-scrollbar {
+  display: none;
+}
+.overflowCon {
+  -ms-overflow-style: none; 
+  scrollbar-width: none; 
 }
 
 /* Add User */
@@ -141,6 +175,7 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative;
 } 
 .addUserBtn {
     width: 40px;
@@ -157,6 +192,21 @@ export default {
 }
 .addUserBtn:hover .fas {
     color: var(--accent-1);
+}
+.friendRequestTotal {
+    height: 20px;
+    width: 20px;
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background-color: var(--accent-1);
+    color: #FFF;
+    font-size: 14px;
+    border-radius: 50%;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 /* User list */
@@ -193,6 +243,38 @@ export default {
 .idle {background-color: #FF8A15;}
 .offline {background-color: var(--accent-1);} 
 
+/* User action menue */
+.userActionBoxCon {
+    position: fixed;
+    width: 200px;
+    top: 100px;
+    right: 300px;
+    background-color: var(--accent-1);
+    border-radius: 5px;
+
+    overflow: hidden;
+}
+.userActionBoxLink {
+    display: block;
+    width: 100%;
+    padding: 5px 10px;
+    border-bottom: 1px solid #E93C49;
+    color: var(--text-1);
+    font-size: 16px;
+    text-decoration: none;
+    display: flex;
+    justify-content: space-between;
+    background-color: var(--accent-1);
+    transition: 0.2s;
+    cursor: pointer;
+}
+.userActionBoxLink:last-child {
+    border-bottom: none;
+}
+.userActionBoxLink:hover {
+    background-color: var(--accent-1-hover);
+}
+
 /* Lobby Container */
 .lobbyCon {
     position: fixed;
@@ -208,11 +290,5 @@ export default {
 }
 .lobbyCon.active {
     right: 60px;
-}
-</style>
-
-<style>
-.overflowCon .simplebar-content {
-    height: 100%;
 }
 </style>

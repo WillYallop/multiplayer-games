@@ -103,6 +103,11 @@ export default {
                     this.friendRequestsResults.splice(requestIndex, 1)
 
                     this.$store.dispatch('loadFriendListData')
+                    this.$store.commit('decrementFriendRequestTotal')
+                    this.$socketTest.emit('newFriend', {
+                        senderUserId: senderUserId,
+                        userId: this.$auth.user._id
+                    });
                 })
                 .catch((err) => {
                     console.log(err)
@@ -115,8 +120,6 @@ export default {
                 .then((res) => {
                     let requestIndex = this.friendRequestsResults.findIndex(x => x._id === requestId)
                     this.friendRequestsResults.splice(requestIndex, 1)
-
-                    this.$store.dispatch('loadFriendListData')
                 })
                 .catch((err) => {
                     console.log(err)
@@ -180,6 +183,9 @@ export default {
                 let userIndex = this.searchUserResults.findIndex(x => x._id === user._id)
                 this.searchUserResults[userIndex].requestSent = true
                 this.key++
+                this.$socketTest.emit('friendRequestPing', {
+                    addUser: user._id
+                });
             })
             .catch((err) => {
                 if(err.response.status === 409) {

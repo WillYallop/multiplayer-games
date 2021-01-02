@@ -245,7 +245,8 @@ export default {
                         data: this.credentials
                     })
                     .then(() => {
-                        this.$router.push('/')
+                        //this.$router.push('/')
+                        window.location.href = "/";
                     })
                 })
                 .catch((err) => {

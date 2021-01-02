@@ -12,7 +12,7 @@
             </div>
             <!-- Create Lobby -->
             <div v-else class="createLobbyCon">
-                <button class="createLobbyBtn"><fa class="fas" :icon="['fa', 'plus']"/></button>
+                <button class="createLobbyBtn" v-on:click="createLobby"><fa class="fas" :icon="['fa', 'plus']"/></button>
                 <p class="createLobbyP">Create a new lobby!</p>
             </div>
         </Simplebar>
@@ -21,6 +21,9 @@
 </template>
 
 <script>
+// Libs
+import axios from 'axios'
+
 // Components
 import Simplebar from 'simplebar-vue'
 
@@ -35,7 +38,9 @@ export default {
         Simplebar
     },
     methods: {
-
+        createLobby() {
+            this.$store.dispatch('createLobby')
+        }
     }
 }
 </script>

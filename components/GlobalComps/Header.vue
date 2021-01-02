@@ -47,7 +47,7 @@ export default {
     },
     methods: {
         closeUserDropdown() {
-            this.userDropdown = !this.userDropdown
+            this.userDropdown = false
         },
         signOut() {
             this.$auth.logout()

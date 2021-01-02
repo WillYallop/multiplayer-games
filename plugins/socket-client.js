@@ -1,6 +1,6 @@
 import io from 'socket.io-client'
 
-export default ({ app, redirect, store, $auth }, inject) => {
+export default ({ app, redirect, store }, inject) => {
     if(store.state.auth.loggedIn) {
         let cookies = document.cookie;
         let authToken = decodeURI(cookies.split('auth._token.local=')[1])
