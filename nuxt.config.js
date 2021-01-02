@@ -19,6 +19,7 @@ export default {
 
   // Plugins to run before rendering page (https://go.nuxtjs.dev/config-plugins)
   plugins: [
+    { src: '~/plugins/persistedstate.js', srr: false },
     { src: '~/plugins/vue-closable.js', ssr: false },
     { src: '~/plugins/vue-particals.js', ssr: false },
     { src: '~/plugins/socket-client.js', ssr: false }

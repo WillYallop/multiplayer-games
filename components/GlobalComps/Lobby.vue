@@ -6,14 +6,21 @@
         </div>
      
         <Simplebar class="lobbyBody" data-simplebar-auto-hide="true">
-            <!-- Lobby -->
-            <div v-if="hasLobby" class="lobbyCon">
-
+            <div v-if="!loading" class="lobbyBodyInner">
+                <!-- Lobby -->
+                <div v-if="lobby" class="lobbyCon">
+                    {{lobby}}
+                    {{players}}
+                    <button v-on:click="$store.dispatch('deleteLobby')">x</button>
+                </div>
+                <!-- Create Lobby -->
+                <div v-else class="createLobbyCon">
+                    <button class="createLobbyBtn" v-on:click="$store.dispatch('createLobby')"><fa class="fas" :icon="['fa', 'plus']"/></button>
+                    <p class="createLobbyP">Create a new lobby!</p>
+                </div>
             </div>
-            <!-- Create Lobby -->
-            <div v-else class="createLobbyCon">
-                <button class="createLobbyBtn" v-on:click="createLobby"><fa class="fas" :icon="['fa', 'plus']"/></button>
-                <p class="createLobbyP">Create a new lobby!</p>
+            <div v-else class="">
+                <p>Loading...</p>
             </div>
         </Simplebar>
         
@@ -30,18 +37,49 @@ import Simplebar from 'simplebar-vue'
 export default {
     data() {
         return {
-            hasLobby: false,
+            loading: true,
+            pingInterval: null
 
         }
     },
     components: {
         Simplebar
     },
+    mounted() {
+        this.$store.dispatch('loadLobby')
+        .then((response) => {
+            this.loading = false
+            this.togglePingCheckInterval()
+        })
+    },
+    computed: {
+        lobby() {
+            return this.$store.state.lobby.lobby
+        },
+        players() {
+            return this.$store.state.lobby.players
+        }
+    },
     methods: {
-        createLobby() {
-            this.$store.dispatch('createLobby')
+        checkPing() {
+            this.$store.dispatch('checkPing')
+        },
+        togglePingCheckInterval() {
+            if(this.lobby != false) {
+                this.pingInterval = setInterval(this.checkPing, 60000)
+            } else {
+                clearInterval(this.pingInterval)
+                this.pingInterval = null  
+            }
+        },
+
+    },
+    watch: {
+        lobby() {
+            this.togglePingCheckInterval()
         }
     }
+
 }
 </script>
 
@@ -69,10 +107,13 @@ export default {
 /* Lobby Body */
 .lobbyBody {
     height: calc(100% - 60px);
+} 
+.lobbyBodyInner {
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-} 
+}
 /* Create Lobby */
 .createLobbyCon {
     text-align: center;
@@ -95,13 +136,16 @@ export default {
     color: var(--text-1);
     font-weight: bold;
 }
+
+/* Lobby */
+.lobbyCon {
+    height: 100%;
+}
+
 </style>
 
 <style>
 .lobbyBody .simplebar-content {
     height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 </style>

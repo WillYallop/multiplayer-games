@@ -20,7 +20,8 @@
     "simplebar-vue": "^1.6.0",
     "socket.io-client": "^3.0.4",
     "vue-closable": "0.0.3",
-    "vue-particles": "^1.0.9"
+    "vue-particles": "^1.0.9",
+    "vuex-persistedstate": "^4.0.0-beta.1"
   },
   "devDependencies": {}
 }
