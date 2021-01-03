@@ -21,8 +21,8 @@ const mutations = {
         state.lobby = false;
     },
     updateMyPing(state, data) {
-        var playerIndex = state.players.findIndex(item => item._id === this.$auth.user._id)
-        state.players[playerIndex].ping = data
+        var playerIndex = state.lobby.players.findIndex(item => item.playerId === this.$auth.user._id)
+        state.lobby.players[playerIndex].ping = data
     }
 }
 
@@ -123,6 +123,27 @@ const actions = {
             var receiveDate = (new Date()).getTime();
             var ping = receiveDate - sendDate
             commit('updateMyPing', ping)
+        })
+        .catch((err) => {
+            console.log(err)
+        })
+    },
+    sendJoinLobbyRequest({ commit }, data) {
+        let config = {
+            headers: {
+                Authorization: this.$auth.getToken('local')
+            }
+        }
+        axios.post(process.env.API_URL + '/lobby/invite', {
+            toUser: data.toUser,
+            lobbyId: data.lobbyId,
+            fromUsername: data.fromUsername
+        }, config)
+        .then((response) => {
+            // If its not a duplicate notification send websocket data
+            if(!response.data.alreadyExists) {
+                this.$socketTest.emit('newLobbyRequest', response.data.notification);
+            }
         })
         .catch((err) => {
             console.log(err)

@@ -4,7 +4,30 @@
         <div class="rightSide">
             <!-- Notifications -->
             <div class="notificationCon">
-                <button class="notificationBtn"><fa class="fas" :icon="['fa', 'bell']"/></button>
+                <button class="notificationBtn" ref="notificationBtn" v-on:click="notificationDropdown = !notificationDropdown"><fa class="fas" :icon="['fa', 'bell']"/></button>
+
+                <!-- Notification Dropdown -->
+                <div class="notificationDropdown" v-if="notificationDropdown" v-closable="{exclude: ['notificationBtn'], handler: 'closeNotificationDropdown'}">
+                    <div v-if="notifications.length > 0" class="notificationBody">
+                        <p class="notificationsP">You have {{notifications.length}} notification!</p>
+                        <div class="forNotificationCon" :key="notification._id" v-for="notification in notifications">
+                            <div class="notificationInner" v-if="notification.notificationType === 'lobby'">
+                                <div class="notificationTextarea">
+                                    <p class="notificationActionP">Join Lobby</p>
+                                    <p class="notificationUserP">From {{notification.fromUsername}}</p>
+                                </div>
+                                <div class="notificationBtnArea">
+                                    <button class="notificationDropdownBtn cancel"><fa class="fas" :icon="['fa', 'times']"/></button>
+                                    <button class="notificationDropdownBtn accept"><fa class="fas" :icon="['fa', 'check']"/></button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div v-else class="notificationBody">
+                        <p class="noNotificationsP">You have no notifications!</p>
+                    </div>
+                </div>
             </div>
             <!-- User -->
             <div class="userBtnContainer">
@@ -34,20 +57,36 @@
 export default {
     data() {
         return {
-            userDropdown: false
+            userDropdown: false,
+            notificationDropdown: false
         }
     },
     components: {
 
     },
+    mounted() {
+        // Load Notification data
+        this.$store.dispatch('loadNotificationData')
+
+        // Handle friend request ping
+        this.$socketTest.on('newLobbyRequest', data => {
+            this.$store.commit('pushNewNotificationObject', data)
+        });
+    },
     computed: {
         lobbyStatus() {
             return this.$store.state.siteFunction.lobbyStatus
+        },
+        notifications() {
+            return this.$store.state.siteFunction.notifications
         }
     },
     methods: {
         closeUserDropdown() {
             this.userDropdown = false
+        },
+        closeNotificationDropdown() {
+            this.notificationDropdown = false
         },
         signOut() {
             this.$auth.logout()
@@ -94,6 +133,7 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
 } 
 .notificationBtn {
     background-color: transparent;
@@ -107,6 +147,95 @@ export default {
 }
 .notificationBtn:hover .fas {
     color: var(--accent-1);
+}
+/* Notification Dropdown */
+.notificationDropdown {
+    position: absolute;
+    top: 60px;
+    right: 0;
+    width: 300px;
+    background-color: #FFF;
+    border-radius: 5px;
+    overflow: hidden;
+    border: 1px solid #F2F2F2;
+}
+.notificationBody {
+    width: 100%;
+} 
+.notificationsP {
+    padding: 5px;
+    border-bottom: 1px solid #F2F2F2;
+    font-weight: bold;
+    font-size: 14px;
+}
+.forNotificationCon {
+    padding: 5px;
+}
+.notificationInner {
+    padding: 5px;
+    width: 100%;
+    background-color: #F2F2F2;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+.notificationInner:last-child {
+    margin-bottom: 0;
+}
+.notificationTextarea {
+    padding-right: 10px;
+}
+.notificationActionP {
+    font-weight: bold;
+    font-size: 14px;
+    color: #101010;
+}
+.notificationUserP {
+    font-size: 14px;
+    color: #757575;
+    margin-top: 2px;
+}
+.notificationBtnArea {
+    display: flex;
+    align-items: center;
+}
+.notificationDropdownBtn {
+    height: 30px;
+    width: 30px;
+    min-height: 30px;
+    min-width: 30px;
+    margin-left: 5px;
+    border-radius: 50%;
+    color: #FFF;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: 0.2s;
+    border: none;
+}
+.notificationDropdownBtn .fas {
+    font-size: 14px;
+}
+.notificationDropdownBtn.cancel {
+    background-color: var(--accent-1);
+} 
+.notificationDropdownBtn.cancel:hover {
+    background-color: var(--accent-1-hover);
+} 
+.notificationDropdownBtn.accept {
+    background-color: var(--accent-2);
+}
+.notificationDropdownBtn.accept:hover {
+    background-color: var(--accent-2-hover);
+} 
+.noNotificationsP {
+    padding: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #090D14;
 }
 
 /* User Dropdown */

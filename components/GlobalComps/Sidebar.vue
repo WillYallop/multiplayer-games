@@ -32,7 +32,7 @@
             <!-- User action box -->
             <div class="userActionBoxCon" :style="actionMenuPos" v-if="showUserActionBox" v-closable="{exclude: ['userListIconCon'], handler: 'closeUserActionBox'}">
                 <nuxt-link class="userActionBoxLink" @click.native="showUserActionBox = false" :to="'/user/'+selectedFriendId">View Profile <fa class="fas" :icon="['fa', 'user']"/></nuxt-link>
-                <p class="userActionBoxLink" v-on:click="addToLobby(selectedFriendId); showUserActionBox = false">Add To Lobby <fa class="fas" :icon="['fa', 'plus']"/></p>
+                <p class="userActionBoxLink" v-if="lobby" v-on:click="addToLobby(selectedFriendId, lobby._id,); showUserActionBox = false">Add To Lobby <fa class="fas" :icon="['fa', 'plus']"/></p>
             </div>
 
         </div>
@@ -70,11 +70,13 @@ export default {
         });
         // Handle new friend added
         this.$socketTest.on('newFriend', data => {
-            console.log(data)
             this.$store.commit('addNewFriend', data)
         });
     },
     computed: {
+        lobby() {
+            return this.$store.state.lobby.lobby
+        },
         lobbyStatus() {
             return this.$store.state.siteFunction.lobbyStatus
         },
@@ -95,8 +97,12 @@ export default {
         closeUserActionBox() {
             this.showUserActionBox = false
         },
-        addToLobby(userId) {
-            console.log(userId)
+        addToLobby(userId, lobbyId) {
+            this.$store.dispatch('sendJoinLobbyRequest', {
+                toUser: userId,
+                lobbyId: lobbyId,
+                fromUsername: this.$auth.user.username
+            })
         }
     }
 }
