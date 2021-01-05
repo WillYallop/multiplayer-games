@@ -5,7 +5,7 @@
     <div class="gamesPreviewCon padHori padVert">
 
       <!-- Game Preview for -->
-      <div class="gameCon" :key="game.name" v-for="game in gamesData"> 
+      <div class="gameCon" :key="game.name" v-for="game in gamesData" v-on:click="$store.dispatch('selectLobbyGame', game)"> 
         <div class="gameConInner">
           <div class="gameImg" :style="{ 'background-image' : `url(${game.image})` }">
             <div class="glass"></div>

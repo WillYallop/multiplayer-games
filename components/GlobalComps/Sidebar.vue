@@ -65,11 +65,11 @@ export default {
         this.$store.dispatch('loadFriendRequestData')
 
         // Handle friend request ping
-        this.$socketTest.on('friendRequestPing', data => {
+        this.$socketIo.on('friendRequestPing', data => {
             this.$store.commit('incrementFriendRequestTotal')
         });
         // Handle new friend added
-        this.$socketTest.on('newFriend', data => {
+        this.$socketIo.on('newFriend', data => {
             this.$store.commit('addNewFriend', data)
         });
     },

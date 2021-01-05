@@ -104,7 +104,7 @@ export default {
 
                     this.$store.dispatch('loadFriendListData')
                     this.$store.commit('decrementFriendRequestTotal')
-                    this.$socketTest.emit('newFriend', {
+                    this.$socketIo.emit('newFriend', {
                         senderUserId: senderUserId,
                         userId: this.$auth.user._id
                     });
@@ -183,7 +183,7 @@ export default {
                 let userIndex = this.searchUserResults.findIndex(x => x._id === user._id)
                 this.searchUserResults[userIndex].requestSent = true
                 this.key++
-                this.$socketTest.emit('friendRequestPing', {
+                this.$socketIo.emit('friendRequestPing', {
                     addUser: user._id
                 });
             })

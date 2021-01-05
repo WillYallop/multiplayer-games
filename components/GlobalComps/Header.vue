@@ -17,8 +17,8 @@
                                     <p class="notificationUserP">From {{notification.fromUsername}}</p>
                                 </div>
                                 <div class="notificationBtnArea">
-                                    <button class="notificationDropdownBtn cancel"><fa class="fas" :icon="['fa', 'times']"/></button>
-                                    <button class="notificationDropdownBtn accept"><fa class="fas" :icon="['fa', 'check']"/></button>
+                                    <button class="notificationDropdownBtn cancel" v-on:click="deleteNotification(notification._id)"><fa class="fas" :icon="['fa', 'times']"/></button>
+                                    <button class="notificationDropdownBtn accept" v-on:click="joinLobby(notification._id, notification.lobbyId)"><fa class="fas" :icon="['fa', 'check']"/></button>
                                 </div>
                             </div>
 
@@ -69,7 +69,7 @@ export default {
         this.$store.dispatch('loadNotificationData')
 
         // Handle friend request ping
-        this.$socketTest.on('newLobbyRequest', data => {
+        this.$socketIo.on('newLobbyRequest', data => {
             this.$store.commit('pushNewNotificationObject', data)
         });
     },
@@ -93,6 +93,15 @@ export default {
             .then(() => {
                 this.$router.go()
             })
+        },
+        joinLobby(notificationId, lobbyId) {
+            this.$store.dispatch('acceptLobbyRequest', {
+                notificationId: notificationId,
+                lobbyId: lobbyId
+            })
+        },
+        deleteNotification(notificationId) {
+            this.$store.dispatch('deleteNotification', notificationId)
         }
     }
 }
@@ -299,28 +308,34 @@ export default {
     top: 40px;
     left: 0;
     right: 0;
-    background-color: var(--accent-1);
+    background-color: #FFFFFF;
+    border: 1px solid #F2F2F2;
     border-radius: 0 0 5px 5px;
+    padding: 5px;
     overflow: hidden;
 }
 .dropdownLink {
     display: block;
     width: 100%;
     padding: 5px 10px;
-    border-bottom: 1px solid #E93C49;
-    color: var(--text-1);
+    color: #101010;
     font-size: 16px;
     text-decoration: none;
     display: flex;
     justify-content: space-between;
-    background-color: var(--accent-1);
+    background-color: #F2F2F2;
     transition: 0.2s;
     cursor: pointer;
+    margin-bottom: 5px;
+    border-radius: 5px;
 }
 .dropdownLink:last-child {
-    border-bottom: none;
+    margin-bottom: 0;
 }
 .dropdownLink:hover {
-    background-color: var(--accent-1-hover);
+    background-color: #ECECEC;
+}
+.dropdownLink .fas {
+    color: #848484;
 }
 </style>

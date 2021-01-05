@@ -119,6 +119,7 @@ select:focus {outline: none;}
 .btnStylised:hover {
   border-radius: 2px 20px 2px 20px;
 }
+.btnStylised.greenBtnStylised {background-color: var(--accent-2); color: var(--background);}
 .underlineSpan {
   position: absolute;
   bottom: 6px;
@@ -131,6 +132,9 @@ select:focus {outline: none;}
 .btnStylised:hover .underlineSpan {
   width: 80%;
   left: 12px;
+}
+.btnStylised.greenBtnStylised .underlineSpan { 
+  background-color: var(--background);
 }
 
 /* INput Styling */

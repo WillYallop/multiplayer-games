@@ -3,14 +3,17 @@
 
         <div class="lobbyHeaderCon">
             <p class="lobbyHeaderP"><fa class="fas" :icon="['fa', 'users']"/> Lobby <span class="highlightTextP">0/8</span></p>
-            <button class="deleteLobbyBtn" v-on:click="$store.dispatch('deleteLobby')"><fa class="fas" :icon="['fa', 'times']"/></button>
+            <div v-if="lobby" class="lobbyBtnCon">
+                <button v-if="$auth.user._id === lobby.adminId" class="deleteLobbyBtn" v-on:click="$store.dispatch('deleteLobby')"><fa class="fas" :icon="['fa', 'times']"/></button>
+                <button v-else class="deleteLobbyBtn" v-on:click="$store.dispatch('leaveLobby')"><fa class="fas" :icon="['fa', 'times']"/></button>
+            </div>
         </div>
      
         <Simplebar class="lobbyBody" data-simplebar-auto-hide="true">
             <div v-if="!loading" class="lobbyBodyInner">
                 <!-- Lobby -->
                 <div v-if="lobby" class="lobbyCon">
-                    
+            
                     <div class="topHalfCon">
                         <!-- Player Display -->
                         <div class="playerCon" :key="player._id" v-for="player in players" :class="{ 'readyUp' : isReadyUp(player._id) }">
@@ -29,14 +32,42 @@
                             <div class="playerRightCol">
                                 <PingIcon
                                 :ping="returnPing(player._id)"/>
-                                <button v-if="player._id != lobby.adminId" class="removePlayerBtn"><fa class="fas" :icon="['fa', 'times']"/></button>
+                                <button v-if="player._id != lobby.adminId && $auth.user._id === lobby.adminId" class="removePlayerBtn"><fa class="fas" :icon="['fa', 'times']"/></button>
                             </div>
                         </div>
-                        <p style="color: #FFF;">{{lobby}}</p>
                     </div>
+
                     <div class="botHalfCon">
-                        <!-- Ready up / ready down button -->
-                        <button class="btnStylised" aria-label="Sign In"><span class="underlineSpan"></span>Ready Up</button>
+                        <!-- Game Selected -->
+                        <div class="gamePreviewCon">
+                            <div v-if="lobby.selectedGame.game" class="gamePreInnerCon">
+                                <div class="gamePreLeftCon">
+                                    <img :src="lobby.selectedGame.image" class="gameIcon">
+                                    <div class="gamePreTextarea">
+                                        <p class="gameTitleP">Game Selected:</p>
+                                        <p class="gameP">{{lobby.selectedGame.title}}</p>
+                                    </div>
+                                </div>
+                                <div class="gamePrePlayerCap">
+                                    <fa class="fas" :icon="['fa', 'users']"/>
+                                    <p class="playersP">{{lobby.selectedGame.min_players}}-{{lobby.selectedGame.max_players}}</p>
+                                </div>
+                            </div>
+                            <div v-else class="gamePreInnerCon">
+                                <div class="gamePreLeftCon">
+                                    <div class="emptyGameIcon"></div>
+                                    <div class="gamePreTextarea">
+                                        <p class="gameTitleP">Game Selected:</p>
+                                        <p class="gameP">No game selected!</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="botHalfBotCon">
+                            <!-- Ready up / ready down button -->
+                            <button class="btnStylised" :class="{ 'greenBtnStylised': readyStatus() }" v-on:click="$store.dispatch('readyToggle', readyStatus())"><span class="underlineSpan"></span> <span v-if="readyStatus()">Ready</span><span v-else>Not Ready</span></button>
+                            <button v-if="playersReady && $auth.user._id === lobby.adminId" class="btnStylised greenBtnStylised" style="margin-top: 10px;" v-on:click="$store.dispatch('startTimer')"><span class="underlineSpan"></span> Start Game</button>
+                        </div>
                     </div>
                     
                 </div>
@@ -61,6 +92,7 @@ import axios from 'axios'
 // Components
 import Simplebar from 'simplebar-vue'
 import PingIcon from '@/components/GlobalComps/PingIcon'
+import lobby from '~/store/modules/lobby'
 
 export default {
     data() {
@@ -81,6 +113,41 @@ export default {
             this.loading = false
             this.togglePingCheckInterval()
         })
+
+        // Listen to players joining lobby
+        this.$socketIo.on('personJoinedLobby', data => {
+            this.$store.commit('addPlayerToLobby', data)
+        });
+
+        // Listen to players leaving lobby
+        this.$socketIo.on('personLeftLobby', data => {
+            this.$store.commit('personLeftLobby', data)
+        });
+
+        // Admin deleted lobby
+        this.$socketIo.on('adminDeletedLobby', data => {
+            this.$store.dispatch('lobbyEnded')
+        });
+
+        // Make users send their ping, when a user rejoins the lobby socket
+        this.$socketIo.on('updatePingRequest', data => {
+            this.$store.dispatch('checkPing')
+        });
+
+        // Update lobby players with users ping
+        this.$socketIo.on('sendUserPingToLobby', data => {
+            this.$store.commit('updateUsersPing', data)
+        });
+
+        // Toggle players ready up status 
+        this.$socketIo.on('playerReadyToggle', data => {
+            this.$store.commit('updatePlayersReadyStatus', data)
+        });
+
+        // Admin set lobby game
+        this.$socketIo.on('setLobbyGame', data => {
+            this.$store.commit("setLobbyGame", data);
+        });
     },
     computed: {
         lobby() {
@@ -88,6 +155,16 @@ export default {
         },
         players() {
             return this.$store.state.lobby.players
+        },
+        playersReady () {
+            let playersReady = false
+            for(var i = 0; i < this.lobby.players.length; i++) {
+                this.lobby.players[i].playerReady ? playersReady = true : playersReady = false
+                if(!playersReady) {
+                    break
+                }
+            }
+            return playersReady
         }
 
     },
@@ -108,14 +185,17 @@ export default {
             }
         },
         isReadyUp(id) {
-            var playerIndex = this.lobby.players.findIndex(item => item.playerId === this.$auth.user._id)
+            var playerIndex = this.lobby.players.findIndex(item => item.playerId === id)
             return this.lobby.players[playerIndex].playerReady
         },
         returnPing(id) {
-            var playerIndex = this.lobby.players.findIndex(item => item.playerId === this.$auth.user._id)
+            var playerIndex = this.lobby.players.findIndex(item => item.playerId === id)
             return this.lobby.players[playerIndex].ping
+        },
+        readyStatus() {
+            var player = this.lobby.players.find(item => item.playerId === this.$auth.user._id)
+            return !player.playerReady
         }
-
     },
     watch: {
         lobby() {
@@ -218,7 +298,11 @@ export default {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    margin-bottom: 5px;
 } 
+.playerCon:last-child {
+    margin-bottom: 0;
+}
 .playerCon.readyUp {
     border: 2px solid var(--accent-2);
 }
@@ -286,10 +370,64 @@ export default {
 .botHalfCon {
     width: 100%;
     align-self: flex-end;
+    
+}
+.botHalfBotCon {
     padding: 20px;
 }
-.botHalfCon .btnStylised {
+.botHalfBotCon .btnStylised {
     width: 100%;
+}
+
+/* Game Preview */
+.gamePreviewCon {
+    border-top: 1px solid var(--border);
+    padding: 20px 20px 0;
+} 
+.gamePreInnerCon {
+    display: flex;
+    justify-content: space-between;
+} 
+.gamePreLeftCon {
+    display: flex;
+    align-items: center;
+} 
+.gameIcon {
+    height: 50px;
+    width: 50px;
+    min-width: 50px;
+    border-radius: 5px;
+    object-fit: cover;
+    background-color: #0F1721;
+} 
+.emptyGameIcon {
+    height: 50px;
+    width: 50px;
+    min-width: 50px;
+    border-radius: 5px;
+    background-color: #0F1721;
+} 
+.gamePreTextarea {
+    padding-left: 10px;
+} 
+.gameTitleP {
+    color: var(--text-1);
+} 
+.gameP {
+    color: var(--text-2);
+} 
+.gamePrePlayerCap {
+  padding-left: 10px;
+}
+.gamePrePlayerCap .fas {
+  color: var(--accent-1);
+  font-size: 14px;
+}
+.playersP {
+  color: var(--accent-1);
+  font-size: 12px;
+  font-weight: bold;
+  margin-top: -2px;
 }
 
 </style>
